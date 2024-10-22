@@ -76,6 +76,10 @@ export const makeSocket = (config: SocketConfig) => {
 		url = new URL(`tcp://${MOBILE_ENDPOINT}:${MOBILE_PORT}`)
 	}
 
+	if(!config.mobile && url.protocol === 'wss' && authState?.creds?.routingInfo) {
+		url.searchParams.append('ED', authState.creds.routingInfo.toString('base64url'))
+	}
+
 	const ws = config.socket ? config.socket : config.mobile ? new MobileSocketClient(url, config) : new WebSocketClient(url, config)
 
 	ws.connect()
@@ -88,7 +92,8 @@ export const makeSocket = (config: SocketConfig) => {
 		keyPair: ephemeralKeyPair,
 		NOISE_HEADER: config.mobile ? MOBILE_NOISE_HEADER : NOISE_WA_HEADER,
 		mobile: config.mobile,
-		logger
+		logger,
+		routingInfo: authState?.creds?.routingInfo
 	})
 
 	const { creds } = authState
@@ -650,6 +655,33 @@ export const makeSocket = (config: SocketConfig) => {
 
 	ws.on('CB:ib,,downgrade_webclient', () => {
 		end(new Boom('Multi-device beta not joined', { statusCode: DisconnectReason.multideviceMismatch }))
+	})
+
+	ws.on('CB:ib,,edge_routing', (node: BinaryNode) => {
+		const edgeRoutingNode = getBinaryNodeChild(node, 'edge_routing')
+		const routingInfo = getBinaryNodeChild(edgeRoutingNode, 'routing_info')
+		if(routingInfo?.content) {
+			authState.creds.routingInfo = Buffer.from(routingInfo?.content as Uint8Array)
+		}
+	})
+
+	ws.on('CB:ib,,offline_preview', (node: BinaryNode) => {
+		const offlinePreviewNode = getBinaryNodeChild(node, 'offline_preview')
+		const previewCount = +(offlinePreviewNode?.attrs.count || 0)
+		const appDataChanges = +(offlinePreviewNode?.attrs.appdata || 0)
+		const messageCount = +(offlinePreviewNode?.attrs.message || 0)
+		const notificationCount = +(offlinePreviewNode?.attrs.notification || 0)
+		const receiptCount = +(offlinePreviewNode?.attrs.receipt || 0)
+
+		logger.info(`appdata changes: ${appDataChanges}, messages: ${messageCount}, notifications: ${notificationCount}, receipts: ${receiptCount}`)
+
+		ev.emit('offline.preview', {
+			total: previewCount,
+			appDataChanges,
+			messages: messageCount,
+			notifications: notificationCount,
+			receipts: receiptCount
+		})
 	})
 
 	let didStartBuffer = false
