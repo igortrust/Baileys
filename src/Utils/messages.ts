@@ -259,7 +259,7 @@ export const prepareWAMessageMedia = async (
 
 	if (cacheableKey) {
 		logger?.debug({ cacheableKey }, 'set cache')
-		options.mediaCache!.set(cacheableKey, WAProto.Message.encode(obj).finish())
+		options.mediaCache!.set(cacheableKey, WAProto.Message.encode(obj).finish(),"86400")
 	}
 
 	return { ...obj, handle }

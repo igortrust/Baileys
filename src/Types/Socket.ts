@@ -15,7 +15,7 @@ export type CacheStore = {
     /** get a cached key and change the stats */
     get<T>(key: string): T | undefined
     /** set a key in the cache */
-    set<T>(key: string, value: T): void
+    set<T>(key: string, value: T, tll?: string): void
     /** delete a key from the cache */
     del(key: string): void
     /** flush all data */
