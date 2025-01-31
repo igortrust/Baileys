@@ -888,6 +888,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 
 			if(msgRetryCache.get<number>(cacheKey) >= maxMsgRetryCount) {
 				logger.warn({ attrs }, 'reached max retry count, not sending message again')
+				msgRetryCache.del(cacheKey)
 				return
 			}
 
