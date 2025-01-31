@@ -28,9 +28,12 @@ const encodeBinaryNodeInner = (
 		}
 	}
 
-	const pushBytes = (bytes: Uint8Array | Buffer | number[]) => (
-		bytes.forEach (b => buffer.push(b))
-	)
+	const pushBytes = (bytes: Uint8Array | Buffer | number[]) => {
+		for(const b of bytes) {
+			buffer.push(b)
+		}
+	}
+
 	const pushInt16 = (value: number) => {
 		pushBytes([(value >> 8) & 0xff, value & 0xff])
 	}
@@ -151,8 +154,7 @@ const encodeBinaryNodeInner = (
 			return false
 		}
 
-		for(let i = 0;i < str.length;i++) {
-			const char = str[i]
+		for(const char of str) {
 			const isInNibbleRange = char >= '0' && char <= '9'
 			if(!isInNibbleRange && char !== '-' && char !== '.') {
 				return false
@@ -167,8 +169,7 @@ const encodeBinaryNodeInner = (
 			return false
 		}
 
-		for(let i = 0;i < str.length;i++) {
-			const char = str[i]
+		for(const char of str) {
 			const isInNibbleRange = char >= '0' && char <= '9'
 			if(!isInNibbleRange && !(char >= 'A' && char <= 'F') && !(char >= 'a' && char <= 'f')) {
 				return false
@@ -188,8 +189,6 @@ const encodeBinaryNodeInner = (
 			pushByte(tokenIndex.index)
 		} else if(isNibble(str)) {
 			writePackedBytes(str, 'nibble')
-		} else if(isHex(str)) {
-			writePackedBytes(str, 'hex')
 		} else if(str) {
 			const decodedJid = jidDecode(str)
 			if(decodedJid) {
