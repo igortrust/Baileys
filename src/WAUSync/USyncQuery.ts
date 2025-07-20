@@ -1,6 +1,6 @@
 import { USyncQueryProtocol } from '../Types/USync'
 import { BinaryNode, getBinaryNodeChild } from '../WABinary'
-import { USyncContactProtocol, USyncDeviceProtocol, USyncDisappearingModeProtocol, USyncStatusProtocol } from './Protocols'
+import { USyncContactProtocol, USyncDeviceProtocol, USyncDisappearingModeProtocol, USyncStatusProtocol, USyncLIDProtocol } from './Protocols'
 import { USyncUser } from './USyncUser'
 
 export type USyncQueryResultList = { [protocol: string]: unknown, id: string }
@@ -98,6 +98,11 @@ export class USyncQuery {
 
 	withDisappearingModeProtocol() {
 		this.protocols.push(new USyncDisappearingModeProtocol())
+		return this
+	}
+
+	withLIDProtocol() {
+		this.protocols.push(new USyncLIDProtocol())
 		return this
 	}
 }

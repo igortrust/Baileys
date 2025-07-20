@@ -4,11 +4,12 @@ export const SERVER_JID = 'server@c.us'
 export const PSA_WID = '0@c.us'
 export const STORIES_JID = 'status@broadcast'
 
-export type JidServer = 'c.us' | 'g.us' | 'broadcast' | 's.whatsapp.net' | 'call' | 'lid' | 'newsletter'
+export type JidServer = 'c.us' | 'g.us' | 'broadcast' | 's.whatsapp.net' | 'call' | 'lid' | 'newsletter' | 'bot'
 
 export type JidWithDevice = {
     user: string
     device?: number
+    jid?: string
 }
 
 export type FullJid = JidWithDevice & {
@@ -56,6 +57,13 @@ export const isJidGroup = (jid: string | undefined) => (jid?.endsWith('@g.us'))
 export const isJidStatusBroadcast = (jid: string) => jid === 'status@broadcast'
 /** is the jid a newsletter */
 export const isJidNewsletter = (jid: string | undefined) => (jid?.endsWith('@newsletter'))
+
+const botRegexp = /^1313555\d{4}$|^131655500\d{2}$/
+
+export const isJidBot = (jid: string | undefined) => jid && botRegexp.test(jid.split('@')[0]) && jid.endsWith('@c.us')
+
+/** is the jid Meta IA */
+export const isJidMetaIa = (jid: string | undefined) => jid?.endsWith('@bot')
 
 export const jidNormalizedUser = (jid: string | undefined) => {
 	const result = jidDecode(jid)

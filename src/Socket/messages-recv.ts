@@ -96,7 +96,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 			tag: 'ack',
 			attrs: {
 				id: attrs.id,
-				to: attrs.from,
+				to: attrs.from || attrs.sender_lid,
 				class: tag
 			}
 		}
